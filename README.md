@@ -4,6 +4,8 @@
 
 PulseSense is a simple Streamlit app that uses a trained machine-learning model to provide a heart-disease risk screening signal from health measurements.
 
+**Live: https://pulse-sense-pranjal-hiray.streamlit.app/**
+
 The app is designed to be easy to use:
 
 1. Enter the requested health information.
