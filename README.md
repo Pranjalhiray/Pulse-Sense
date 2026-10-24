@@ -1,133 +1,166 @@
-Markdown
-# PulseSense — Heart Disease Risk Prediction
+# PulseSense
 
-PulseSense is an interactive Streamlit application that uses a trained K-Nearest Neighbors (KNN) model to provide a heart-disease risk screening signal based on common clinical measurements.
+## Heart health screening app
 
----
+PulseSense is a simple Streamlit app that uses a trained machine-learning model to provide a heart-disease risk screening signal from health measurements.
 
-> **Medical Disclaimer:** This application is strictly for educational and screening purposes. It is not a medical diagnostic tool and must not replace professional medical advice, diagnosis, or treatment.
+The app is designed to be easy to use:
 
----
+1. Enter the requested health information.
+2. Select **Run my heart health check**.
+3. Review the model's screening signal.
 
-## Features
+> **Important medical notice**  
+> PulseSense is for education and early screening only. It is not a diagnosis and must not replace a doctor, medical test, or emergency care. If you have severe or urgent symptoms, contact emergency services immediately.
 
-* **Dark Glassmorphism Interface:** Designed for a modern, responsive user experience.
-* **Interactive Health-Profile Form:** Direct clinical data input using native Streamlit controls.
-* **Automated Data Preprocessing:** Real-time handling of one-hot encoding, feature reordering, and scaling.
-* **Serialized Model Inference:** Uses a trained K-Nearest Neighbors classifier to generate predictions.
-* **Risk Categorization:** Clear visual indication of elevated-risk or lower-risk status based on input metrics.
+## Start here
 
----
+### 1. Install Python
 
-## Project Structure
+Install Python 3.10 or newer from [python.org](https://www.python.org/downloads/).
 
-```text
-Heart Disease/
-├── app.py             # Streamlit interface and prediction pipeline
-├── KNN_heart.pkl      # Serialized K-Nearest Neighbors model
-├── scaler.pkl         # Serialized StandardScaler instance
-├── columns.pkl        # Serialized list of expected input columns
-├── requirements.txt   # Dependencies list
-└── README.md          # Project documentation
-Requirements
-Python 3.10 or higher
+### 2. Open the project folder
 
-Core dependencies: streamlit, pandas, numpy, scikit-learn, joblib
+Open PowerShell or a terminal in the folder containing `app.py`.
 
-The complete list of required packages can be found in requirements.txt.
+### 3. Create a virtual environment
 
-Installation and Setup
-1. Clone the Repository
-Bash
-git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
-cd "Heart Disease"
-2. Set Up a Virtual Environment
-Windows PowerShell:
+Using a virtual environment keeps this project separate from other Python projects.
 
-PowerShell
+#### Windows PowerShell
+
+```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-macOS / Linux:
+```
 
-Bash
-python3 -m venv .venv
-source .venv/bin/activate
-3. Install Dependencies
-Bash
-python -m pip install --upgrade pip
+If PowerShell blocks activation, you can run the environment directly without activating it:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m streamlit run app.py
+```
+
+### 4. Install the dependencies
+
+```powershell
 python -m pip install -r requirements.txt
-Running the Application
-Execute the following command from the root directory:
+```
 
-Bash
+The dependency list is stored in [requirements.txt](./requirements.txt).
+
+### 5. Launch PulseSense
+
+```powershell
 streamlit run app.py
-Once running, the application will be accessible at:http://localhost:8501
+```
 
-Input Fields
-The application evaluates the following clinical metrics:
+Open the local address shown in the terminal. It is usually:
 
-Age
+```text
+http://localhost:8501
+```
 
-Sex
+To stop the app, return to the terminal and press `Ctrl+C`.
 
-Resting blood pressure (mm Hg)
+## What the app asks for
 
-Serum cholesterol (mg/dl)
+PulseSense collects the following information:
 
-Chest pain type
+| Section | Information |
+| --- | --- |
+| Personal details | Age and sex |
+| Basic measurements | Resting blood pressure and cholesterol |
+| Heart signals | Chest pain type, resting ECG, maximum heart rate, and exercise-induced angina |
+| Additional indicators | Fasting blood sugar, ST depression, and ST-segment slope |
 
-Resting electrocardiographic results
+Use the values from a trusted medical measurement or report whenever possible. Do not guess values if you are using the result to discuss your health with a clinician.
 
-Maximum heart rate achieved
+## Understanding the result
 
-Exercise-induced angina
+After submission, the app displays:
 
-Fasting blood sugar (> 120 mg/dl)
+- A summary of selected values
+- A model signal percentage when available
+- Either an **Elevated risk signal** or **Lower risk signal** message
 
-ST depression induced by exercise relative to rest (Oldpeak)
+The result describes what the model sees in the supplied data. It does not confirm whether a person has or does not have heart disease.
 
-Slope of the peak exercise ST segment
+## How it works
 
-Prediction Workflow
-Input: The user submits clinical parameters via the interface.
+The prediction pipeline is:
 
-Encoding: Categorical variables undergo one-hot encoding.
+```text
+User input
+    -> categorical values converted to model columns
+    -> missing columns filled with zero
+    -> columns reordered to training order
+    -> numerical values standardized
+    -> KNN model prediction
+    -> screening result shown in the app
+```
 
-Alignment: Input features are aligned and padded to match the 15-feature schema expected by columns.pkl.
+The app uses a saved K-Nearest Neighbors classifier. The model compares a new input with similar examples from its training data and predicts the most common class among its nearest neighbors.
 
-Scaling: Continuous variables are transformed using scaler.pkl.
+## Files in this project
 
-Inference: The processed feature array is passed to KNN_heart.pkl.
+| File | Purpose |
+| --- | --- |
+| [app.py](./app.py) | Streamlit interface and prediction pipeline |
+| [KNN_heart.pkl](./KNN_heart.pkl) | Trained KNN model |
+| [scaler.pkl](./scaler.pkl) | Fitted feature scaler |
+| [columns.pkl](./columns.pkl) | Expected model feature order |
+| [requirements.txt](./requirements.txt) | Python dependencies |
+| [README.md](./README.md) | Project guide |
 
-Output: The application renders the resulting risk classification.
+## Troubleshooting
 
-Model Configuration
-The serialized model is a scikit-learn KNeighborsClassifier configured with:
+### `streamlit` is not recognized
 
-n_neighbors: 5
+Run Streamlit through the virtual environment:
 
-weights: 'uniform'
+```powershell
+.\.venv\Scripts\python.exe -m streamlit run app.py
+```
 
-metric: 'minkowski'
+### A package is missing
 
-p: 2 (Euclidean distance metric)
+Reinstall the dependencies:
 
-Evaluation and Limitations
-Dataset Exclusion: The raw dataset and training scripts are omitted from this repository. Consequently, model performance metrics (such as accuracy, precision, recall, and ROC-AUC) are not explicitly documented.
+```powershell
+python -m pip install -r requirements.txt
+```
 
-Evaluation Guidance: When retraining or evaluating this model, primary consideration should be given to Recall. In clinical screening scenarios, minimizing false negatives (classifying a high-risk individual as low-risk) is critical.
+### The browser page does not open
 
-Compatibility: Ensure runtime environments match the version of scikit-learn used during model serialization to prevent deserialization warnings or errors.
+Copy the URL printed in the terminal and open it manually. The default address is `http://localhost:8501`.
 
-Urgent Care Notice: Individuals experiencing acute or worsening medical symptoms should seek immediate care from a qualified healthcare provider.
+### The model raises a loading or compatibility warning
 
-Repository Files
-app.py — Application entry point and inference logic
+The model files were serialized separately from the application. Loading them with the same scikit-learn version used during training is recommended. If the original training environment is unavailable, retrain and save the model again with the current environment.
 
-KNN_heart.pkl — Saved K-Nearest Neighbors model
+## Technical details
 
-scaler.pkl — Saved StandardScaler pipeline
+The saved model is a `KNeighborsClassifier` with:
 
-columns.pkl — Saved feature column ordering
+- `n_neighbors = 5`
+- Uniform neighbor weighting
+- Minkowski distance
+- Euclidean distance configuration with `p = 2`
+- 15 processed input features
 
-requirements.txt — Environment specifications
+The application uses `StandardScaler` before prediction and caches the model artifacts for faster Streamlit reruns.
+
+## Project limitations
+
+- The original raw dataset is not included.
+- The training script is not included.
+- Accuracy, precision, recall, F1-score, ROC-AUC, and confusion-matrix results are not currently documented.
+- The model may not generalize to every population or healthcare setting.
+- A model probability is not the same as a medical probability or diagnosis.
+
+For a stronger academic or production project, add the dataset source, data dictionary, training notebook, evaluation report, dependency versions, and model validation results.
+
+## License
+
+This project does not currently include a license file. Add a license before distributing or publishing it.
